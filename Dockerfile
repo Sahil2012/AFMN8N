@@ -2,20 +2,28 @@ FROM n8nio/n8n:2.0.3
 
 USER root
 
-# 1. Install Python and dependencies
-RUN apk add --update --no-cache python3 py3-pip python3-dev build-base linux-headers
+RUN apk add --update --no-cache \
+    python3 py3-pip python3-dev build-base linux-headers \
+    redis bash su-exec
 
-# 2. Create the virtual environment n8n expects
-# We put it in /home/node/python_venv
+# Create the virtual environment
 RUN python3 -m venv /home/node/python_venv
 
-# 3. Install libraries INTO that virtual environment
+# Install Python libraries
 RUN /home/node/python_venv/bin/pip install --no-cache-dir pandas requests numpy
 
-# 4. Set permissions so the 'node' user can access it
+# Set permissions
 RUN chown -R node:node /home/node/python_venv
+
+# Create supervisor config to run multiple processes
+COPY supervisord.conf /etc/supervisord.conf
 
 USER node
 
-# 5. Tell n8n to use this specific virtual environment
+# At the end of Dockerfile, should be:
 ENV N8N_PYTHON_BINARY=/home/node/python_venv/bin/python
+ENV N8N_RUNNERS_MODE=external
+ENV N8N_RUNNERS_TASK_BROKER_URI=redis://localhost:6379
+
+# Stay as root for supervisor
+ENTRYPOINT ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
