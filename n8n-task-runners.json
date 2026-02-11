@@ -49,7 +49,7 @@
 			"env-overrides": {
 				"PYTHONPATH": "/opt/runners/task-runner-python",
 				"N8N_RUNNERS_STDLIB_ALLOW": "json,math,datetime,random,re,statistics,decimal",
-				"N8N_RUNNERS_EXTERNAL_ALLOW": "numpy,pandas"
+				"N8N_RUNNERS_EXTERNAL_ALLOW": "numpy,pandas,bs4"
 			}
 		}
 	]
